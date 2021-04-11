@@ -1,0 +1,1 @@
+[warn] insecure HTTP request is deprecated 'http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release'; switch to HTTPS or opt-in as ("Redshift" at "http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release").withAllowInsecureProtocol(true)
