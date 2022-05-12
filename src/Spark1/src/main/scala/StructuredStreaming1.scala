@@ -1,5 +1,6 @@
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.streaming.Trigger
 
 object StructuredStreaming1 {
   def main(args: Array[String]): Unit = {
@@ -26,9 +27,11 @@ object StructuredStreaming1 {
     .format("console")
     .outputMode("complete")
     .option("checkpointLocation","ck1")
+    .trigger(Trigger.Once())
     .start()
 
     df4.awaitTermination()
+
 
 
 

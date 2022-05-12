@@ -17,6 +17,7 @@ object SparkStreaming  {
     val ssc = new StreamingContext(sc, Seconds(5))
 
     val lines = ssc.socketTextStream("localhost", 9999)
+    
     ssc.checkpoint(".")
     val words = lines.flatMap(x => x.split(" "))
     val pairs = words.map(x => (x, 1))

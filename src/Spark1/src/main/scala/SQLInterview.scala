@@ -1,5 +1,6 @@
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{Row, SparkSession}
+
 import scala.collection.mutable.ListBuffer
 
 
@@ -22,6 +23,62 @@ object SQLInterview extends Serializable {
 
     val spark = SparkSession.builder().appName(("joinsinterview")).master("local[*]")
       .getOrCreate()
+
+
+/*    val df = spark.read.option("header",true).csv("C:\\Users\\suresh\\Desktop\\Spark\\datasets\\order_data.csv")
+    //df.show()
+    val schema = df.schema
+    val x = 1 to 100
+    var x1:Seq[Int] = Seq()
+
+    x.foreach(xx=>{
+      x1 = x1:+xx
+    })
+
+    //println(x1)
+
+
+    df.foreachPartition((part: Iterator[Row]) => {
+      var x: Seq[Row] = Seq()
+      part.foreach(row => {
+        x = x :+ row
+        /*        try {
+          throw new Exception
+        } catch {
+          case e: Exception =>
+            x = x:+row
+        }
+ */
+      })
+    
+      //println(x)
+
+      val rdd = spark.sparkContext.parallelize(x)
+      val dfe = spark.createDataFrame(rdd,schema)
+      dfe.write.mode("append").csv("C:\\Users\\suresh\\Desktop\\Spark\\datasets\\bigrecords")
+    }
+    )
+
+
+ */
+    //val dfrep = df.repartition(4)
+/*    df.foreachPartition(
+      iterator =>{
+        var x:Seq[Row] = Seq()
+        iterator.foreach(row => {
+           try {
+            throw new Exception
+          } catch {
+            case e: Exception =>
+              x = x:+row
+          }
+        })
+        val rdd = spark.sparkContext.parallelize(x)
+        val dfe = spark.createDataFrame(rdd,schema)
+        dfe.write.mode("append").csv("C:\\Users\\suresh\\Desktop\\Spark\\datasets\\bigrecords")
+    })
+
+ */
 
     import spark.implicits._
 
@@ -193,6 +250,8 @@ object SQLInterview extends Serializable {
     //productsDF1.show()
     productsDF1.createOrReplaceTempView("prod")
 
+    spark.sql(""" (select orderdate, order_id, sum(quantity) from prod group by orderdate,orderid)""").show()
+
     spark.sql(
       """ select product_id, size(collect_set(orderdate)) as size,count(*) as count
         | from prod
@@ -326,21 +385,82 @@ Problem Statements :- Write SQL to display total number
       (9,"Mouse",2000,4600)
     ).toDF("id","product","year","price")
 
-    saledf1.show()
+   // saledf1.show()
 
     saledf1.groupBy("year").pivot("year").sum("price")
 
     saledf1.createOrReplaceTempView("sale1")
 
+    val df43 = Seq((null,"A"),
+      ("A","B"),
+      ("A","C"),
+      ("B","D"),
+      ("B","F"),
+      ("C","H"),
+      ("D","M")).toDF("Parent","Child")
+
+   // df43.show()
+
+    df43.createOrReplaceTempView("pp")
+
+   val df44 =  spark.sql(
+      """ select Parent, Child , CASE
+        | when Parent is null then 1
+        | when Parent= 'A' then 2
+        | when Parent ='B' then 3
+        | else ASCII(parent)-ASCII("A")+1 end as Level_In_Fammily_Tree from pp
+        |
+        |""".stripMargin)
+
+    // df44.show()
+
+
+     /*
+      Employees earning more than their managers
+
+    val dfemp1 = Seq((1,"joe",70000,3)
+      ,(2,"henry",80000,4)
+    ,(3,"sam",60000,null)
+      ,(4,"max",90000,null)).toDF("id","name","salary","mid")
+
+    dfemp1.show()
+
+      */
+
+    val dfemail = Seq((1,"a@b.com")
+    ,(2,"c@b.com")
+    ,(3,"a@b.com")).toDF("id","email")
+
+   // dfemail.show()
+
+    dfemail.createOrReplaceTempView("email")
+
+    val dferesult = spark.sql(
+      """
+        | select email
+        | from email group by email having count(email)>1
+        |""".stripMargin)
+
+    //dferesult.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  /*   spark.sql(
       """ select  group by year pivot(year) sum(price) from sale1
         |
         |""".stripMargin).show()  */
-
-
-
-
-
 
 
 
